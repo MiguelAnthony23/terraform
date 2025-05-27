@@ -10,7 +10,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg" {
   name     = "rg-apache-barato"
-  location = "East US" 
+  location = "West Europe" # Cambio de East Us a West Europe 
 }
 
 resource "azurerm_virtual_network" "vnet" {
@@ -32,7 +32,7 @@ resource "azurerm_public_ip" "public_ip" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static" # IP estática para que no cambie
-  sku                 = "Standard" # IP estática para que no cambie
+  sku                 = "Standard" 
 }
 
 resource "azurerm_network_interface" "nic" {
@@ -75,26 +75,27 @@ resource "azurerm_linux_virtual_machine" "vm" {
   name                = "apache-vm-barata"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  size                = "Standard_B1ls" # más barata aún
+  size                = "Standard_B2s"
   admin_username      = "azureuser"
   network_interface_ids = [azurerm_network_interface.nic.id]
 
-  admin_password                  = "P@ssword1234!"
+  admin_password                   = "P@ssword1234!"
   disable_password_authentication = false
 
   priority        = "Spot"
-  eviction_policy = "Deallocate" # se apaga si Azure necesita la capacidad
+  eviction_policy = "Deallocate"
 
   os_disk {
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS" # disco HDD estándar
+    storage_account_type = "Standard_LRS"
   }
 
-source_image_reference {
+ source_image_reference {
   publisher = "Canonical"
-  offer     = "0001-com-ubuntu-server-focal"
-  sku       = "20_04-lts"
+  offer     = "UbuntuServer"
+  sku       = "18_04-lts"
   version   = "latest"
 }
   custom_data = filebase64("install_apache.sh")
 }
+
