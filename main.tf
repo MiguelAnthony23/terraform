@@ -10,7 +10,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg" {
   name     = "rg-apache-barato"
-  location = "West Europe" # Cambio de East Us a West Europe 
+  location = "North Europe" # Cambio de East Us a West Europe 
 }
 
 resource "azurerm_virtual_network" "vnet" {
@@ -75,15 +75,12 @@ resource "azurerm_linux_virtual_machine" "vm" {
   name                = "apache-vm-barata"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  size                = "Standard_B2s"
+  size                = "Standard_D4_v3"
   admin_username      = "azureuser"
   network_interface_ids = [azurerm_network_interface.nic.id]
 
   admin_password                   = "P@ssword1234!"
   disable_password_authentication = false
-
-  priority        = "Spot"
-  eviction_policy = "Deallocate"
 
   os_disk {
     caching              = "ReadWrite"
@@ -93,7 +90,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
  source_image_reference {
   publisher = "Canonical"
   offer     = "UbuntuServer"
-  sku       = "18_04-lts"
+  sku       = "18.04-LTS"
   version   = "latest"
 }
   custom_data = filebase64("install_apache.sh")
