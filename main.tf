@@ -90,12 +90,11 @@ resource "azurerm_linux_virtual_machine" "vm" {
     storage_account_type = "Standard_LRS" # disco HDD estándar
   }
 
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "20_04-lts"
-    version   = "latest"
-  }
-
+source_image_reference {
+  publisher = "Canonical"
+  offer     = "0001-com-ubuntu-server-focal"
+  sku       = "20_04-lts"
+  version   = "latest"
+}
   custom_data = filebase64("install_apache.sh")
 }
