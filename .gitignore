@@ -1,0 +1,5 @@
+# Ignore all files in the root directory
+.terraform/
+*.exe
+*.zip
+*.tar.gz
