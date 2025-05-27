@@ -1,4 +1,7 @@
 provider "azurerm" {
+  features {
+    
+  }
   client_id       = var.client_id
   client_secret   = var.client_secret
   subscription_id = var.subscription_id
@@ -7,7 +10,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg" {
   name     = "rg-apache-barato"
-  location = "East US" # Puedes probar "North Europe" o "West Europe" también
+  location = "East US" 
 }
 
 resource "azurerm_virtual_network" "vnet" {
