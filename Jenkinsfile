@@ -6,6 +6,7 @@ pipeline {
         AZURE_CLIENT_SECRET   = credentials('AZURE_CLIENT_SECRET')
         AZURE_TENANT_ID       = credentials('AZURE_TENANT_ID')
         AZURE_SUBSCRIPTION_ID = credentials('AZURE_SUBSCRIPTION_ID')
+        TERRAFORM             = 'C:\\Terraform\\terraform.exe'
     }
 
     stages {
@@ -29,13 +30,13 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                bat 'terraform init'
+                bat '%TERRAFORM% init'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                bat 'terraform apply -auto-approve'
+                bat '%TERRAFORM% apply -auto-approve'
             }
         }
 
@@ -43,7 +44,7 @@ pipeline {
             steps {
                 script {
                     env.PUBLIC_IP = bat(
-                        script: "terraform output -raw vm_public_ip",
+                        script: "%TERRAFORM% output -raw vm_public_ip",
                         returnStdout: true
                     ).trim()
                     echo "IP Pública obtenida: ${env.PUBLIC_IP}"
