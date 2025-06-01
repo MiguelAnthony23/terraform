@@ -75,5 +75,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Esperar antes de destruir') {
+            steps {
+                echo "Esperando 3 minutos antes de destruir la infraestructura..."
+                sleep time: 3, unit: 'MINUTES'
+            }
+        }
+
+        stage('Terraform Destroy') {
+            steps {
+                bat '%TERRAFORM% destroy -auto-approve'
+            }
+        }
     }
 }
