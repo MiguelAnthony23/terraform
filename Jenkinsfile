@@ -6,7 +6,6 @@ pipeline {
         AZURE_CLIENT_SECRET   = credentials('AZURE_CLIENT_SECRET')
         AZURE_TENANT_ID       = credentials('AZURE_TENANT_ID')
         AZURE_SUBSCRIPTION_ID = credentials('AZURE_SUBSCRIPTION_ID')
-        TERRAFORM             = 'C:\\Terraform\\terraform.exe'
     }
 
     stages {
@@ -30,32 +29,32 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                bat '%TERRAFORM% init'
+                bat 'C:\\Terraform\\terraform.exe init'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                bat '%TERRAFORM% apply -auto-approve'
+                bat 'C:\\Terraform\\terraform.exe apply -auto-approve'
             }
         }
 
         stage('Get Public IP') {
             steps {
                 script {
-                    def rawOutput = bat(
-                        script: "%TERRAFORM% output -raw vm_public_ip",
+                    env.PUBLIC_IP = bat(
+                        script: 'C:\\Terraform\\terraform.exe output -raw vm_public_ip',
                         returnStdout: true
                     ).trim()
-
-                    def matcher = rawOutput =~ /(\d{1,3}\.){3}\d{1,3}/
-                    if (matcher.find()) {
-                        env.PUBLIC_IP = matcher.group(0)
-                        echo "IP Pública obtenida: ${env.PUBLIC_IP}"
-                    } else {
-                        error("No se pudo extraer una IP válida de la salida: ${rawOutput}")
-                    }
+                    echo "IP Pública obtenida: ${env.PUBLIC_IP}"
                 }
+            }
+        }
+
+        stage('Esperar Apache') {
+            steps {
+                echo "Esperando 30 segundos para que Apache se inicie..."
+                sleep time: 30, unit: 'SECONDS'
             }
         }
 
@@ -66,7 +65,7 @@ pipeline {
                         script: "curl -s -o NUL -w \"%%{http_code}\" http://${env.PUBLIC_IP}",
                         returnStdout: true
                     ).trim()
-
+                    echo "Código HTTP devuelto: ${result}"
                     if (result == '200') {
                         echo "Apache está funcionando correctamente en ${env.PUBLIC_IP}"
                     } else {
@@ -78,14 +77,14 @@ pipeline {
 
         stage('Esperar antes de destruir') {
             steps {
-                echo "Esperando 3 minutos antes de destruir la infraestructura..."
+                echo "Esperando 3 minutos antes de destruir los recursos..."
                 sleep time: 3, unit: 'MINUTES'
             }
         }
 
         stage('Terraform Destroy') {
             steps {
-                bat '%TERRAFORM% destroy -auto-approve'
+                bat 'C:\\Terraform\\terraform.exe destroy -auto-approve'
             }
         }
     }
