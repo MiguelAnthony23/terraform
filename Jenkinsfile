@@ -22,7 +22,6 @@ pipeline {
                         --username $AZURE_CLIENT_ID \
                         --password $AZURE_CLIENT_SECRET \
                         --tenant $AZURE_TENANT_ID
-
                     az account set --subscription $AZURE_SUBSCRIPTION_ID
                 '''
             }
@@ -34,18 +33,37 @@ pipeline {
             }
         }
 
-        stage('Terraform Plan') {
+        stage('Terraform Apply') {
             steps {
-                sh 'terraform plan'
+                sh 'terraform apply -auto-approve'
             }
         }
 
-        stage('Terraform Apply') {
-            when {
-                expression { return env.APPLY_TF == 'true' }
-            }
+        stage('Get Public IP') {
             steps {
-                sh 'terraform apply -auto-approve'
+                script {
+                    env.PUBLIC_IP = sh(
+                        script: "terraform output -raw vm_public_ip",
+                        returnStdout: true
+                    ).trim()
+                    echo "IP Pública obtenida: ${env.PUBLIC_IP}"
+                }
+            }
+        }
+
+        stage('Check Apache') {
+            steps {
+                script {
+                    def result = sh(
+                        script: "curl -s -o /dev/null -w \"%{http_code}\" http://${env.PUBLIC_IP}",
+                        returnStdout: true
+                    ).trim()
+                    if (result == '200') {
+                        echo "Apache está funcionando correctamente en ${env.PUBLIC_IP}"
+                    } else {
+                        error("Apache no está funcionando correctamente. Código HTTP: ${result}")
+                    }
+                }
             }
         }
     }
