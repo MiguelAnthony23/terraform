@@ -43,11 +43,18 @@ pipeline {
         stage('Get Public IP') {
             steps {
                 script {
-                    env.PUBLIC_IP = bat(
+                    def rawOutput = bat(
                         script: "%TERRAFORM% output -raw vm_public_ip",
                         returnStdout: true
                     ).trim()
-                    echo "IP Pública obtenida: ${env.PUBLIC_IP}"
+
+                    def matcher = rawOutput =~ /(\d{1,3}\.){3}\d{1,3}/
+                    if (matcher.find()) {
+                        env.PUBLIC_IP = matcher.group(0)
+                        echo "IP Pública obtenida: ${env.PUBLIC_IP}"
+                    } else {
+                        error("No se pudo extraer una IP válida de la salida: ${rawOutput}")
+                    }
                 }
             }
         }
@@ -59,6 +66,7 @@ pipeline {
                         script: "curl -s -o NUL -w \"%%{http_code}\" http://${env.PUBLIC_IP}",
                         returnStdout: true
                     ).trim()
+
                     if (result == '200') {
                         echo "Apache está funcionando correctamente en ${env.PUBLIC_IP}"
                     } else {
