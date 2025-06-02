@@ -42,10 +42,11 @@ pipeline {
         stage('Get Public IP') {
             steps {
                 script {
-                    env.PUBLIC_IP = bat(
+                    def output = bat(
                         script: 'C:\\Terraform\\terraform.exe output -raw vm_public_ip',
                         returnStdout: true
                     ).trim()
+                    env.PUBLIC_IP = output
                     echo "IP Pública obtenida: ${env.PUBLIC_IP}"
                 }
             }
