@@ -42,10 +42,14 @@ pipeline {
         stage('Get Public IP') {
             steps {
                 script {
-                    env.PUBLIC_IP = bat(
+                    def output = bat(
                         script: 'C:\\Terraform\\terraform.exe output -raw vm_public_ip',
                         returnStdout: true
-                    ).trim()
+                    )
+                    // Filtra solo la última línea (la IP)
+                    def lines = output.readLines()
+                    def ip = lines[-1].trim()
+                    env.PUBLIC_IP = ip
                     echo "IP Pública obtenida: ${env.PUBLIC_IP}"
                 }
             }
@@ -64,12 +68,14 @@ pipeline {
                     def result = bat(
                         script: "curl -s -o NUL -w \"%%{http_code}\" http://${env.PUBLIC_IP}",
                         returnStdout: true
-                    ).trim()
-                    echo "Código HTTP devuelto: ${result}"
-                    if (result == '200') {
+                    )
+                    def lines = result.readLines()
+                    def code = lines[-1].trim()
+                    echo "Código HTTP devuelto: ${code}"
+                    if (code == '200') {
                         echo "Apache está funcionando correctamente en ${env.PUBLIC_IP}"
                     } else {
-                        error("Apache no está funcionando correctamente. Código HTTP: ${result}")
+                        error("Apache no está funcionando correctamente. Código HTTP: ${code}")
                     }
                 }
             }
