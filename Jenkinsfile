@@ -68,12 +68,14 @@ pipeline {
                     def result = bat(
                         script: "curl -s -o NUL -w \"%%{http_code}\" http://${env.PUBLIC_IP}",
                         returnStdout: true
-                    ).trim()
-                    echo "Código HTTP devuelto: ${result}"
-                    if (result == '200') {
+                    )
+                    def lines = result.readLines()
+                    def code = lines[-1].trim()
+                    echo "Código HTTP devuelto: ${code}"
+                    if (code == '200') {
                         echo "Apache está funcionando correctamente en ${env.PUBLIC_IP}"
                     } else {
-                        error("Apache no está funcionando correctamente. Código HTTP: ${result}")
+                        error("Apache no está funcionando correctamente. Código HTTP: ${code}")
                     }
                 }
             }
