@@ -45,8 +45,11 @@ pipeline {
                     def output = bat(
                         script: 'C:\\Terraform\\terraform.exe output -raw vm_public_ip',
                         returnStdout: true
-                    ).trim()
-                    env.PUBLIC_IP = output
+                    )
+                    // Filtra solo la última línea (la IP)
+                    def lines = output.readLines()
+                    def ip = lines[-1].trim()
+                    env.PUBLIC_IP = ip
                     echo "IP Pública obtenida: ${env.PUBLIC_IP}"
                 }
             }
