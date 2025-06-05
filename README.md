@@ -3,7 +3,7 @@ Terraform + Jenkins + Apache en Azure
 
 Este proyecto automatiza el despliegue de una máquina virtual en Azure con Apache preinstalado, utilizando **Terraform** como herramienta de infraestructura como código y **Jenkins** para la integración continua.
 
-##Estructura del repositorio
+*Estructura del repositorio*
 
 
 
@@ -16,14 +16,14 @@ terraform/
 ├── Jenkinsfile         # Pipeline de Jenkins
 
 
-##Tecnologías utilizadas
+*Tecnologías utilizadas*
 
 - **Terraform**: Automatización del aprovisionamiento en Azure.
 - **Jenkins**: Automatización del pipeline de despliegue.
 - **Azure**: Infraestructura en la nube.
 - **Apache**: Servidor web instalado automáticamente en la VM.
 
-##¿Qué hace este proyecto?
+*¿Qué hace este proyecto?*
 
 1. Crea un grupo de recursos, red virtual, subred, IP pública, NSG y una VM en Azure.
 2. Instala Apache automáticamente en la máquina virtual.
@@ -33,7 +33,7 @@ terraform/
    - Espera a que Apache esté disponible.
    - Comprueba el estado del servidor web.
 
-##Requisitos de Jenkins
+*Requisitos de Jenkins*
 
 - Credenciales almacenadas en Jenkins (ID):
   - `AZURE_CLIENT_ID`
@@ -45,7 +45,7 @@ terraform/
   - Terraform instalado.
   - Agente con capacidad para ejecutar scripts `sh` o `bat`.
 
-##Cómo probar
+*Cómo probar*
 
 ```bash
 # Clonar el repositorio
@@ -54,23 +54,17 @@ git clone https://github.com/MiguelAnthony23/terraform.git
 # Ejecutar desde Jenkins mediante el pipeline definido en Jenkinsfile
 ````
 
-##Verificación
+*Verificación*
 
 El pipeline comprueba si Apache está funcionando accediendo por HTTP a la IP pública de la VM.
 
-##Problemas comunes
+*Problemas comunes*
 
 * Errores de cuota (SKUs no disponibles): Cambia la región o solicita aumento.
 * Conflictos con versiones de Terraform o incompatibilidades en Jenkins: Asegúrate de usar versiones compatibles.
 * Apache puede tardar unos segundos en arrancar, por eso el pipeline incluye un `sleep`.
 
-##Licencia
+*Licencia*
 
 Este proyecto está disponible bajo licencia [MIT](LICENSE).
 
-```
-
----
-
-¿Quieres que lo suba formateado como archivo real para que puedas copiarlo tal cual o que lo integre directamente a tu repositorio vía instrucciones Git?
-```
